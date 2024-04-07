@@ -73,13 +73,11 @@ def build_data (rooms_data_list,rooms_names_list, n_guests): #Func for collectio
                 rates.append(rate) 
 
     return rates
-
-for i in range(30):
-    rates = [] #list with rates(JSON)          
-    url = "https://www.qantas.com/hotels/properties/18482?adults=2&checkIn=2024-05-20&checkOut=2024-05-21&children=0&infants=0"
-    soup_gl = get_soup(url)        
-    (build_data(get_rooms_data_html(soup_gl),get_rooms_name(soup_gl),n_guests(soup_gl)))
-    print(rates)
+rates = [] #list with rates(JSON)          
+url = "https://www.qantas.com/hotels/properties/18482?adults=2&checkIn=2024-05-20&checkOut=2024-05-21&children=0&infants=0"
+soup_gl = get_soup(url)        
+(build_data(get_rooms_data_html(soup_gl),get_rooms_name(soup_gl),n_guests(soup_gl)))
+print(rates)
 
     
     
