@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -11,10 +12,11 @@ def get_soup(url): #Func to get the full data of the requested url, returns soup
     driver = webdriver.Chrome()
     driver.implicitly_wait(10)
     driver.get(url)
-    time.sleep(5)
-    Button = driver.find_elements(By.CSS_SELECTOR,".css-v84xw-NakedButton.eml2css7") #clicking ton all rates to expand them 
+    time.sleep(10)
+    Button = driver.find_elements(By.CSS_SELECTOR,".css-v84xw-NakedButton.eml2css7") #clicking on all rates to expand them 
     for btn in Button:
         btn.click()
+        
     time.sleep(5)
     content = driver.page_source
     soup = BeautifulSoup(content,'html.parser')
@@ -56,9 +58,12 @@ def build_data (rooms_data_list,rooms_names_list, n_guests): #Func for collectio
             single_rate = rate.findAll('div', attrs={'data-testid': 'offer-card-expanded'})
             for rate in single_rate:
                 price = rate.find('span',class_= "css-1bjudru e1c6pi2o1").get_text()
-                top_deals = rate.find('span',class_= "css-1jr3e3z-Text-BadgeText e34cw120").get_text()
+                top_deals = rate.find('span',class_= "css-1jr3e3z-Text-BadgeText e34cw120")
                 rate_name = rate.find('h3',class_= "css-10yvquw-Heading-Heading-Text e13es6xl3").get_text()
-                cancellation_pollicy = rate.find('span', attrs={'data-testid': 'cancellation-policy-message'}).get_text()
+                cancellation_pollicy = rate.find('span', attrs={"data-testid": "cancellation-policy-message"}).get_text()
+                if cancellation_pollicy.upper() == "FREE CANCELLATION":
+                    cancellation_pollicy_before_date = rate.find('span', attrs={"data-testid": "free-cancellation-before-date"}).get_text() 
+                    cancellation_pollicy = cancellation_pollicy + " " + cancellation_pollicy_before_date
                 if top_deals:
                     top_deal = True
                 else:
@@ -69,11 +74,13 @@ def build_data (rooms_data_list,rooms_names_list, n_guests): #Func for collectio
 
     return rates
 rates = [] #list with rates(JSON)          
-url = "https://www.qantas.com/hotels/properties/18482?adults=2&checkIn=2024-05-20&checkOut=2024-05-21&children=0&infants=0"
+url = "https://www.qantas.com/hotels/properties/1011276?adults=2&checkIn=2024-05-20&checkOut=2024-05-21&children=0&infants=0"
 soup_gl = get_soup(url)        
 (build_data(get_rooms_data_html(soup_gl),get_rooms_name(soup_gl),n_guests(soup_gl)))
 print(rates)
 
+    
+    
 """ This code for using several ulrs - combination of the ci/co+hotels_id....
 
 urls = ["https://www.qantas.com/hotels/properties/18482?adults=2&checkIn=2024-05-20&checkOut=2024-05-21&children=0&infants=0", "https://www.qantas.com/hotels/properties/18482?adults=2&checkIn=2024-08-20&checkOut=2024-08-21&children=0&infants=0"] # list with urls
